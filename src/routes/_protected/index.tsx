@@ -2,8 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAccount } from "jazz-tools/react-core";
 import { ButtonLink } from "@/components/elements/ButtonLink";
 import { Button } from "@/components/ui/button";
+import { descriptionPropertyDefinition } from "@/coTypes/PropertyDefinitions/descriptionPropertyDefinition";
+import { dueDatePropertyDefinition } from "@/coTypes/PropertyDefinitions/dueDatePropertyDefinition";
+import { estimatePropertyDefinition } from "@/coTypes/PropertyDefinitions/estimatePropertyDefinition";
 import { isCompletedPropertyDefinition } from "@/coTypes/PropertyDefinitions/isCompletedPropertyDefinition";
 import { statusPropertyDefinition } from "@/coTypes/PropertyDefinitions/statusPropertyDefinition";
+import { tagsPropertyDefinition } from "@/coTypes/PropertyDefinitions/tagsPropertyDefinition";
 import { MyAppAccount } from "@/schema";
 
 export const Route = createFileRoute("/_protected/")({
@@ -32,12 +36,23 @@ function IndexComponent() {
         propertyDefinitions: [
           statusPropertyDefinition,
           isCompletedPropertyDefinition,
+          descriptionPropertyDefinition,
+          estimatePropertyDefinition,
+          dueDatePropertyDefinition,
+          tagsPropertyDefinition,
         ],
         views: [
           {
             name: "Table",
             type: "table",
-            visiblePropertyKeys: ["status", "isCompleted"],
+            visiblePropertyKeys: [
+              "status",
+              "isCompleted",
+              "description",
+              "estimate",
+              "dueDate",
+              "tags",
+            ],
           },
         ],
         description: "",

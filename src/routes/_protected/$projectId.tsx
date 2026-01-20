@@ -38,7 +38,14 @@ function RouteComponent() {
       ];
       project.items.$jazz.push({
         title: itemName,
-        values: { status: rndStatus, isCompleted: false },
+        values: {
+          status: rndStatus,
+          isCompleted: false,
+          description: "",
+          estimate: 0,
+          dueDate: null,
+          tags: [],
+        },
       });
     }
   };
