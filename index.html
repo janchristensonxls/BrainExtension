@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Webapp to take control of your tasks to free your mind" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <script>
+      ;(() => {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const storedTheme = localStorage.getItem('theme')
+        const themeClass = storedTheme || (prefersDark ? 'dark' : 'light')
+
+        if (themeClass) {
+          document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('app').classList.add(themeClass)
+          })
+        }
+      })()
+    </script>
+    <title>Brain Extension</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
