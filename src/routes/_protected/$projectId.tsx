@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Account, co } from "jazz-tools";
+import { co } from "jazz-tools";
 import { useCoState } from "jazz-tools/react-core";
 import { ItemCard } from "@/components/ItemCard";
+import { TableView } from "@/components/views/TableView";
 import { Button } from "@/components/ui/button";
 import { type ItemValue, Project, type PropertyValue } from "@/coTypes/data";
-import { MyAppAccount } from "@/schema";
 import { handlePageLoad } from "@/utils/handlePageLoad";
 
 export const Route = createFileRoute("/_protected/$projectId")({
@@ -38,7 +38,7 @@ function RouteComponent() {
       ];
       project.items.$jazz.push({
         title: itemName,
-        values: { status: rndStatus },
+        values: { status: rndStatus, isCompleted: false },
       });
     }
   };
@@ -77,6 +77,17 @@ function RouteComponent() {
       <div>
         <h2 className="text-lg font-semibold mb-2">Items </h2>
         <Button onClick={handleAddItem}>Add Item</Button>
+        {project.views?.[0]?.type === "table" && (
+          <div className="mt-4">
+            <TableView
+              items={project.items}
+              propertyDefinitions={project.propertyDefinitions}
+              view={project.views[0]}
+              onOpenPropertyEditor={() => {}}
+              onChangeProperty={onItemPropertyChanged}
+            />
+          </div>
+        )}
         {project.items.length > 0 ? (
           <div style={{ maxWidth: 400, marginTop: 16 }}>
             {project.items

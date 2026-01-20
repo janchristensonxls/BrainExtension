@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useAccount, useCoState } from "jazz-tools/react-core";
+import { useAccount } from "jazz-tools/react-core";
 import { ButtonLink } from "@/components/elements/ButtonLink";
 import { Button } from "@/components/ui/button";
 import { isCompletedPropertyDefinition } from "@/coTypes/PropertyDefinitions/isCompletedPropertyDefinition";
@@ -32,6 +32,13 @@ function IndexComponent() {
         propertyDefinitions: [
           statusPropertyDefinition,
           isCompletedPropertyDefinition,
+        ],
+        views: [
+          {
+            name: "Table",
+            type: "table",
+            visiblePropertyKeys: ["status", "isCompleted"],
+          },
         ],
         description: "",
         createdAt: new Date(),
