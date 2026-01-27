@@ -32,9 +32,7 @@ export const DatePreview: React.FC<PropertyPreviewProps> = ({
     interaction === "inlineEditor" && widget === "datePicker" && !!onChange;
 
   if (inline) {
-    const inputValue = dateValue
-      ? dateValue.toISOString().slice(0, 10)
-      : "";
+    const inputValue = dateValue ? dateValue.toISOString().slice(0, 10) : "";
     return (
       <Input
         type="date"

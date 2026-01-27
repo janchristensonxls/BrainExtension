@@ -13,8 +13,6 @@ type PropertyPreviewProps = {
 
 export const BooleanPreview: React.FC<PropertyPreviewProps> = ({
   value,
-  propDef,
-  onOpenEditor,
   onChange,
 }) => {
   const current = typeof value === "string" ? value : "";

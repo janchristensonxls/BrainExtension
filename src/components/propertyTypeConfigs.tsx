@@ -1,9 +1,9 @@
 ///Each property type maps to a preview and editor component
 import type React from "react";
-import {
-  type ItemPropertyDefinitionValue,
-  type PropertyType,
-  type PropertyValue,
+import type {
+  ItemPropertyDefinitionValue,
+  PropertyType,
+  PropertyValue,
 } from "@/coTypes/data";
 import { BooleanPreview } from "./propertyViews/BooleanPreView";
 import { DatePreview } from "./propertyViews/DatePreview";
@@ -17,12 +17,12 @@ type PropertyTypeConfig = {
     value: PropertyValue;
     propDef: ItemPropertyDefinitionValue;
     onOpenEditor?: () => void;
-    onChange?: (v: any) => void;
+    onChange?: (v: PropertyValue) => void;
   }>;
   editor?: React.ComponentType<{
     value: PropertyValue;
     propDef: ItemPropertyDefinitionValue;
-    onChange?: (v: any) => void;
+    onChange?: (v: PropertyValue) => void;
   }>;
 };
 

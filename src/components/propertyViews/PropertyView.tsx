@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
 import {
   type ItemPropertyDefinitionValue,
   type ItemValue,
@@ -73,7 +71,7 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
           }
           onChange={
             onChangeProperty
-              ? (v) => onChangeProperty(item, propDef.key, v)
+              ? (v: PropertyValue) => onChangeProperty(item, propDef.key, v)
               : undefined
           }
         />,
@@ -93,18 +91,33 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
           }
           onChange={
             onChangeProperty
-              ? (v) => onChangeProperty(item, propDef.key, v)
+              ? (v: PropertyValue) => onChangeProperty(item, propDef.key, v)
               : undefined
           }
         />
       </>
     ));
 
-  return (
-    <div
+  return clickable ? (
+    <button
+      type="button"
       onClick={handleClick}
       style={{
-        cursor: clickable ? "pointer" : "default",
+        cursor: "pointer",
+        userSelect: "none",
+        background: "none",
+        border: "none",
+        padding: 0,
+        font: "inherit",
+        color: "inherit",
+        textAlign: "inherit",
+      }}
+    >
+      {content}
+    </button>
+  ) : (
+    <div
+      style={{
         userSelect: "none",
       }}
     >

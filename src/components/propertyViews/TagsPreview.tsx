@@ -16,7 +16,10 @@ function normalizeTags(value: PropertyValue): string[] {
     return value.filter((tag) => typeof tag === "string");
   }
   if (typeof value === "string" && value.trim()) {
-    return value.split(",").map((tag) => tag.trim()).filter(Boolean);
+    return value
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
   }
   return [];
 }

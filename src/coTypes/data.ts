@@ -181,7 +181,7 @@ export function itemHasLoadedValues(
   item: ItemValue,
 ): item is ItemValue & ItemInput {
   // We know `values` is a CoMap-ish thing with $jazz metadata
-  const anyValues = item.values as any;
+  const anyValues = item.values;
   return anyValues?.$jazz?.loadingState === "loaded";
 }
 

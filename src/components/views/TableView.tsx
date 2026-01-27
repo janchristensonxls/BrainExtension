@@ -16,7 +16,11 @@ type TableViewProps = {
     item: ItemValue,
     def: ItemPropertyDefinitionValue,
   ) => void;
-  onChangeProperty?: (item: ItemValue, key: string, value: PropertyValue) => void;
+  onChangeProperty?: (
+    item: ItemValue,
+    key: string,
+    value: PropertyValue,
+  ) => void;
 };
 
 export const TableView: React.FC<TableViewProps> = ({
