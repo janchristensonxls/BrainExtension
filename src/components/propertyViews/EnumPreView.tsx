@@ -19,7 +19,7 @@ function safeParseOptions(json?: string | null): EnumOptions | null {
     if (
       obj &&
       Array.isArray(obj.values) &&
-      obj.values.every((v: any) => typeof v === "string")
+      obj.values.every((v: unknown) => typeof v === "string")
     ) {
       return { values: obj.values };
     }
@@ -39,7 +39,6 @@ type PropertyPreviewProps = {
 export const EnumPreview: React.FC<PropertyPreviewProps> = ({
   value,
   propDef,
-  onOpenEditor,
   onChange,
 }) => {
   if (value === null || value === undefined) return <span>-</span>;
@@ -81,7 +80,7 @@ export const EnumPreview: React.FC<PropertyPreviewProps> = ({
       // );
 
       <Select value={current} onValueChange={(val) => onChange(val)}>
-        <SelectTrigger className=" min-w-[200px] inline-flex">
+        <SelectTrigger className=" min-w-50 inline-flex">
           <SelectValue placeholder="Pick one" />
         </SelectTrigger>
         <SelectContent>
@@ -107,8 +106,8 @@ export const EnumPreview: React.FC<PropertyPreviewProps> = ({
     );
   }
   // fallback: clickable to open a modal editor (later)
-  const clickable =
-    interaction !== "none" && interaction !== "inlineEditor" && !!onOpenEditor;
+  // const clickable =
+  //   interaction !== "none" && interaction !== "inlineEditor" && !!onOpenEditor;
 
   if (value === null || value === undefined) return <span>-</span>;
 

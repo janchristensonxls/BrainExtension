@@ -106,6 +106,32 @@ const propertyViewsConfigSchema = z.record(
 );
 export type PropertyViewsConfig = z.infer<typeof propertyViewsConfigSchema>;
 
+// ============ View Definitions ============
+
+const viewTypeEnum = z.enum(["table", "kanban", "calendar", "list"]);
+export type ViewType = z.infer<typeof viewTypeEnum>;
+
+const viewDefinitionSchema = z.object({
+  name: z.string(),
+  type: viewTypeEnum,
+  visiblePropertyKeys: z.array(z.string()).optional(),
+  sortKey: z.string().optional(),
+  groupBy: z.string().optional(),
+  filters: z.string().optional(), // JSON string for filter definitions
+});
+export type ViewDefinition = z.infer<typeof viewDefinitionSchema>;
+
+export const ViewDefinitionMap = co.map({
+  name: z.string(),
+  type: viewTypeEnum,
+  visiblePropertyKeys: z.array(z.string()).optional(),
+  sortKey: z.string().optional(),
+  groupBy: z.string().optional(),
+  filters: z.string().optional(),
+});
+export type ViewDefinitionInput = co.input<typeof ViewDefinitionMap>;
+export type ViewDefinitionValue = co.loaded<typeof ViewDefinitionMap>;
+
 // ============ Item Property Definition (Jazz) ============
 
 export const ItemPropertyDefinition = co.map({
@@ -145,6 +171,7 @@ export const Project = co.map({
   //users: co.list(MyAppAccount),
   items: co.list(Item),
   propertyDefinitions: co.list(ItemPropertyDefinition),
+  views: co.optional(co.list(ViewDefinitionMap)),
 });
 
 export type ProjectInput = co.input<typeof Project>;
@@ -154,7 +181,7 @@ export function itemHasLoadedValues(
   item: ItemValue,
 ): item is ItemValue & ItemInput {
   // We know `values` is a CoMap-ish thing with $jazz metadata
-  const anyValues = item.values as any;
+  const anyValues = item.values;
   return anyValues?.$jazz?.loadingState === "loaded";
 }
 

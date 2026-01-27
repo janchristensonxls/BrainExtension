@@ -17,7 +17,8 @@ export function PropertyEditor({
     return null;
   }
 
-  const value = item.values[def.key];
+  // Render the appropriate editor based on def.editor.widget
+  // const value = item.values[def.key];
 
   switch (def.editor?.widget) {
     // case "dropdown":
