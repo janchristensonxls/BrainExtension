@@ -151,39 +151,36 @@ export type ItemPropertyDefinitionValue = co.loaded<
   typeof ItemPropertyDefinition
 >;
 
+export const ItemValues = co.record(z.string(), propertyValueSchema);
 // ============ Item (Jazz) ============
 
 export const Item = co.map({
   // We already have $jazz.id as the identity
   title: z.string(),
-  values: co.record(z.string(), propertyValueSchema),
+  values: ItemValues,
 });
 
 export type ItemInput = co.input<typeof Item>;
 export type ItemValue = co.loaded<typeof Item>;
 
+const ItemList = co.list(Item);
 // ============ Project (Jazz) ============
 
 export const Project = co.map({
   name: z.string().min(1, "Project name cannot be empty"),
   description: z.string().optional(),
-  createdAt: z.date().default(() => new Date()),
+  createdAt: z.date(),
   //users: co.list(MyAppAccount),
-  items: co.list(Item),
   propertyDefinitions: co.list(ItemPropertyDefinition),
   views: co.optional(co.list(ViewDefinitionMap)),
+
+  get items(): co.List<typeof Item> {
+    return ItemList;
+  },
 });
 
 export type ProjectInput = co.input<typeof Project>;
 export type ProjectValue = co.loaded<typeof Project>;
-
-export function itemHasLoadedValues(
-  item: ItemValue,
-): item is ItemValue & ItemInput {
-  // We know `values` is a CoMap-ish thing with $jazz metadata
-  const anyValues = item.values;
-  return anyValues?.$jazz?.loadingState === "loaded";
-}
 
 // ============ Decorations Logic ============
 

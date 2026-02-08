@@ -1,58 +1,36 @@
+import { useSuspenseCoState } from "jazz-tools/react-core";
 import type React from "react";
-
-import {
-  computeItemDecorations,
-  type ItemPropertyDefinitionValue,
-  type ItemValue,
-  itemHasLoadedValues,
-  type PropertyValue,
-} from "@/coTypes/data";
+import { computeItemDecorations, Item as ItemCoType, type ItemPropertyDefinitionValue } from "@/coTypes/data";
 import { PropertyView } from "./propertyViews/PropertyView";
 import { Item } from "./ui/item";
 
 // Helper type: valid presentation regions
-type PropertyRegion = NonNullable<
-  ItemPropertyDefinitionValue["presentation"]
->["region"];
+type PropertyRegion = NonNullable<ItemPropertyDefinitionValue["presentation"]>["region"];
 
-function getPropsByRegion(
-  defs: readonly ItemPropertyDefinitionValue[],
-  region: PropertyRegion,
-) {
-  return defs
-    .filter((d) => d.presentation && d.presentation.region === region)
-    .sort(
-      (a, b) => (a.presentation?.order ?? 0) - (b.presentation?.order ?? 0),
-    );
+function getPropsByRegion(defs: readonly ItemPropertyDefinitionValue[], region: PropertyRegion) {
+  return defs.filter((d) => d.presentation && d.presentation.region === region).sort((a, b) => (a.presentation?.order ?? 0) - (b.presentation?.order ?? 0));
 }
 
 export interface ItemCardProps {
-  item: ItemValue;
+  itemId: string;
   propertyDefinitions: readonly ItemPropertyDefinitionValue[];
-  onOpenPropertyEditor?: (
-    item: ItemValue,
-    def: ItemPropertyDefinitionValue,
-  ) => void;
-  onChangeProperty?: (
-    item: ItemValue,
-    key: string,
-    value: PropertyValue,
-  ) => void;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({
-  item,
-  propertyDefinitions,
-  onOpenPropertyEditor,
-  onChangeProperty,
-}) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions }) => {
+  const item = useSuspenseCoState(ItemCoType, itemId, {
+    resolve: {
+      values: {
+        $each: true,
+      },
+    },
+  });
   const headerProps = getPropsByRegion(propertyDefinitions, "header");
   const subtitleProps = getPropsByRegion(propertyDefinitions, "subtitle");
   const badgesProps = getPropsByRegion(propertyDefinitions, "badges");
   const bodyProps = getPropsByRegion(propertyDefinitions, "body");
   const sidebarProps = getPropsByRegion(propertyDefinitions, "sidebar");
 
-  if (!itemHasLoadedValues(item)) {
+  if (!item.$isLoaded) {
     //This ensures that the values are loaded (co.record is lazy and can be NotLoaded until resolved.)
     // You can render a skeleton / "loading..."
     return null;
@@ -120,13 +98,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 }}
               >
                 {headerProps.map((propDef) => (
-                  <PropertyView
-                    key={propDef.$jazz.id ?? propDef.key}
-                    item={item}
-                    propDef={propDef}
-                    onOpenEditor={onOpenPropertyEditor}
-                    onChangeProperty={onChangeProperty}
-                  />
+                  <PropertyView key={propDef.$jazz._instanceID ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
                 ))}
               </div>
             )}
@@ -142,12 +114,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               >
                 {subtitleProps.map((propDef) => (
                   <div key={propDef.$jazz.id ?? propDef.key}>
-                    <PropertyView
-                      item={item}
-                      propDef={propDef}
-                      onOpenEditor={onOpenPropertyEditor}
-                      onChangeProperty={onChangeProperty}
-                    />
+                    <PropertyView valuesId={item.values.$jazz.id} propDef={propDef} />
                   </div>
                 ))}
               </div>
@@ -167,13 +134,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               }}
             >
               {sidebarProps.map((propDef) => (
-                <PropertyView
-                  key={propDef.$jazz.id ?? propDef.key}
-                  item={item}
-                  propDef={propDef}
-                  onOpenEditor={onOpenPropertyEditor}
-                  onChangeProperty={onChangeProperty}
-                />
+                <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
               ))}
             </div>
           )}
@@ -190,13 +151,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             }}
           >
             {badgesProps.map((propDef) => (
-              <PropertyView
-                key={propDef.$jazz.id ?? propDef.key}
-                item={item}
-                propDef={propDef}
-                onOpenEditor={onOpenPropertyEditor}
-                onChangeProperty={onChangeProperty}
-              />
+              <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
             ))}
             {decorations.badges.map((b) => (
               <span
@@ -232,13 +187,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             }}
           >
             {bodyProps.map((propDef) => (
-              <PropertyView
-                key={propDef.$jazz.id ?? propDef.key}
-                item={item}
-                propDef={propDef}
-                onOpenEditor={onOpenPropertyEditor}
-                onChangeProperty={onChangeProperty}
-              />
+              <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
             ))}
           </div>
         )}

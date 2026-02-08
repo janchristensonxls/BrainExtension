@@ -1,11 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AuthProvider } from "jazz-tools/better-auth/auth/react";
 import { JazzInspector } from "jazz-tools/inspector";
-import {
-  JazzReactProvider,
-  useAccount,
-  useIsAuthenticated,
-} from "jazz-tools/react";
+import { JazzReactProvider, useAccount, useIsAuthenticated } from "jazz-tools/react";
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import reportWebVitals from "@/reportWebVitals.ts";
@@ -43,7 +39,7 @@ if (rootElement && !rootElement.innerHTML) {
       <JazzReactProvider
         sync={{
           peer: `wss://cloud.jazz.tools/?key=${import.meta.env.VITE_JAZZ_API_KEY}`,
-          when: "always", // When to sync: "always", "never", or "signedUp"
+          when: "never", // When to sync: "always", "never", or "signedUp"
         }}
         AccountSchema={MyAppAccount}
         authSecretStorageKey="jazz-logged-in-secret-v4"

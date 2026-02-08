@@ -2,33 +2,20 @@ import type React from "react";
 import type {
   ItemPropertyDefinitionValue,
   ItemValue,
-  PropertyValue,
   ViewDefinitionValue,
 } from "@/coTypes/data";
-import { itemHasLoadedValues } from "@/coTypes/data";
 import { PropertyView } from "../propertyViews/PropertyView";
 
 type TableViewProps = {
   items: readonly ItemValue[];
   propertyDefinitions: readonly ItemPropertyDefinitionValue[];
   view: ViewDefinitionValue;
-  onOpenPropertyEditor?: (
-    item: ItemValue,
-    def: ItemPropertyDefinitionValue,
-  ) => void;
-  onChangeProperty?: (
-    item: ItemValue,
-    key: string,
-    value: PropertyValue,
-  ) => void;
 };
 
 export const TableView: React.FC<TableViewProps> = ({
   items,
   propertyDefinitions,
   view,
-  onOpenPropertyEditor,
-  onChangeProperty,
 }) => {
   const visibleKeys = view.visiblePropertyKeys ?? [];
   const columns =
@@ -54,7 +41,7 @@ export const TableView: React.FC<TableViewProps> = ({
         </thead>
         <tbody>
           {items
-            .filter((item) => item.$isLoaded && itemHasLoadedValues(item))
+            .filter((item) => item.values.$isLoaded)
             .map((item) => (
               <tr key={item.$jazz._instanceID} className="border-t">
                 <td className="px-3 py-2 font-medium">
@@ -63,10 +50,8 @@ export const TableView: React.FC<TableViewProps> = ({
                 {columns.map((def) => (
                   <td key={def.$jazz.id ?? def.key} className="px-3 py-2">
                     <PropertyView
-                      item={item}
+                      valuesId={item.values.$jazz.id}
                       propDef={def}
-                      onOpenEditor={onOpenPropertyEditor}
-                      onChangeProperty={onChangeProperty}
                     />
                   </td>
                 ))}

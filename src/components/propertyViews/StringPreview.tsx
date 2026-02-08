@@ -16,11 +16,11 @@ export const StringPreview: React.FC<PropertyPreviewProps> = ({ value, propDef, 
   const inline = interaction === "inlineEditor" && (widget === "textbox" || widget === "textarea") && !!onChange;
 
   if (inline && widget === "textarea") {
-    return <Textarea defaultValue={current} onChange={(event) => onChange(event.target.value)} className="min-h-[60px] text-sm" />;
+    return <Textarea defaultValue={current} onChange={(event) => onChange(event.target.value)} className="min-h-15 text-sm" />;
   }
 
   if (inline) {
-    return <Input defaultValue={current} onChange={(event) => onChange(event.target.value)} className="h-8 text-sm" />;
+    return <Input value={current} onChange={(event) => onChange(event.target.value)} className="h-8 text-sm" />;
   }
 
   return <span>{current || "-"}</span>;

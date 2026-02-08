@@ -1,31 +1,40 @@
-import {
-  type ItemPropertyDefinitionValue,
-  type ItemValue,
-  itemHasLoadedValues,
-  type PropertyValue,
+import { useSuspenseCoState } from "jazz-tools/react";
+import type {
+  ItemPropertyDefinitionValue,
+  PropertyValue,
 } from "@/coTypes/data";
+import { ItemValues } from "@/coTypes/data";
 import { propertyTypeRegistry } from "../propertyTypeConfigs";
 
 type PropertyViewProps = {
-  item: ItemValue;
+  valuesId: string;
   propDef: ItemPropertyDefinitionValue;
-  onOpenEditor?: (item: ItemValue, def: ItemPropertyDefinitionValue) => void;
-  onChangeProperty?: (
-    item: ItemValue,
-    key: string,
-    value: PropertyValue,
-  ) => void;
 };
 
 export const PropertyView: React.FC<PropertyViewProps> = ({
-  item,
+  valuesId,
   propDef,
-  onOpenEditor,
-  onChangeProperty,
 }) => {
-  if (!itemHasLoadedValues(item)) return <>Loading...</>; //This ensures that the values are loaded (co.record is lazy and can be NotLoaded until resolved.)
+  const { $jazz, value } = useSuspenseCoState(ItemValues, valuesId, {
+    resolve: {
+      $each: true,
+    },
+    select: (values) => ({
+      $jazz: values.$jazz,
+      value: values[propDef.key],
+    }),
+    equalityFn: (a, b) => a.value === b.value,
+  });
 
-  const value = item.values[propDef.key];
+  const onChangeProperty = (value: PropertyValue) => {
+    if ($jazz.loadingState === "loaded") {
+      $jazz.set(propDef.key, value);
+    }
+  };
+  const onOpenEditor = () => {};
+
+  if (value === undefined) return <>Loading...</>; //This ensures that the values are loaded (co.record is lazy and can be NotLoaded until resolved.)
+
   const typeConfig = propertyTypeRegistry[propDef.type];
   const Preview = typeConfig.preview;
 
@@ -35,7 +44,7 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
     !!onOpenEditor;
 
   const handleClick = () => {
-    if (clickable && onOpenEditor) onOpenEditor(item, propDef);
+    if (clickable && onOpenEditor) onOpenEditor();
   };
 
   const variant = propDef.presentation?.variant ?? "text";
@@ -66,12 +75,10 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
         <Preview
           value={value}
           propDef={propDef}
-          onOpenEditor={
-            onOpenEditor ? () => onOpenEditor(item, propDef) : undefined
-          }
+          onOpenEditor={onOpenEditor ? () => onOpenEditor() : undefined}
           onChange={
             onChangeProperty
-              ? (v: PropertyValue) => onChangeProperty(item, propDef.key, v)
+              ? (v: PropertyValue) => onChangeProperty(v)
               : undefined
           }
         />,
@@ -86,12 +93,10 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
         <Preview
           value={value}
           propDef={propDef}
-          onOpenEditor={
-            onOpenEditor ? () => onOpenEditor(item, propDef) : undefined
-          }
+          onOpenEditor={onOpenEditor ? () => onOpenEditor() : undefined}
           onChange={
             onChangeProperty
-              ? (v: PropertyValue) => onChangeProperty(item, propDef.key, v)
+              ? (v: PropertyValue) => onChangeProperty(v)
               : undefined
           }
         />
