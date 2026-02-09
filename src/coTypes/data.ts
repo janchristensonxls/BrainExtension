@@ -54,6 +54,65 @@ export type PresentationConfig = z.infer<typeof presentationConfigSchema>;
 
 // ============ Editor Configuration ============
 
+const textboxEditorOptionsSchema = z.object({
+  inputType: z.enum(["text", "number", "email", "url"]).optional(),
+  placeholder: z.string().optional(),
+});
+
+const textareaEditorOptionsSchema = z.object({
+  rows: z.number().int().positive().optional(),
+  placeholder: z.string().optional(),
+  maxLength: z.number().int().positive().optional(),
+});
+
+const dropdownEditorOptionsSchema = z.object({
+  values: z.array(z.string()).optional(),
+  allowCustom: z.boolean().optional(),
+});
+
+const datePickerEditorOptionsSchema = z.object({
+  includeTime: z.boolean().optional(),
+  minDateIso: z.string().optional(),
+  maxDateIso: z.string().optional(),
+});
+
+const checkboxEditorOptionsSchema = z.object({});
+const switchEditorOptionsSchema = z.object({});
+
+const sliderEditorOptionsSchema = z.object({
+  min: z.number().optional(),
+  max: z.number().optional(),
+  step: z.number().positive().optional(),
+});
+
+const colorPickerEditorOptionsSchema = z.object({
+  allowAlpha: z.boolean().optional(),
+});
+
+const tagInputEditorOptionsSchema = z.object({
+  allowCreate: z.boolean().optional(),
+  maxTags: z.number().int().positive().optional(),
+});
+
+const calendarEntryEditorOptionsSchema = z.object({
+  defaultDurationMinutes: z.number().int().positive().optional(),
+  timezone: z.string().optional(),
+});
+
+const editorOptionsSchema = z.union([
+  textboxEditorOptionsSchema,
+  textareaEditorOptionsSchema,
+  dropdownEditorOptionsSchema,
+  datePickerEditorOptionsSchema,
+  checkboxEditorOptionsSchema,
+  switchEditorOptionsSchema,
+  sliderEditorOptionsSchema,
+  colorPickerEditorOptionsSchema,
+  tagInputEditorOptionsSchema,
+  calendarEntryEditorOptionsSchema,
+]);
+export type EditorOptions = z.infer<typeof editorOptionsSchema>;
+
 const editorConfigSchema = z.object({
   widget: z
     .enum([
@@ -69,7 +128,7 @@ const editorConfigSchema = z.object({
       "calendarEntryEditor",
     ])
     .optional(),
-  options: z.string().optional(), // JSON string for widget-specific options
+  options: editorOptionsSchema.optional(),
 });
 export type EditorConfig = z.infer<typeof editorConfigSchema>;
 
@@ -100,9 +159,40 @@ export type DecoratorRule = z.infer<typeof decoratorRuleSchema>;
 
 // ============ Views Configuration ============
 
+const tablePropertyViewConfigSchema = z.object({
+  column: z.boolean().optional(),
+  order: z.number().optional(),
+  width: z.number().positive().optional(),
+});
+
+const kanbanPropertyViewConfigSchema = z.object({
+  laneKey: z.boolean().optional(),
+  showOnCard: z.boolean().optional(),
+  cardOrder: z.number().optional(),
+});
+
+const calendarPropertyViewConfigSchema = z.object({
+  useAsStart: z.boolean().optional(),
+  useAsEnd: z.boolean().optional(),
+  useAsAllDay: z.boolean().optional(),
+  eventOrder: z.number().optional(),
+});
+
+const listPropertyViewConfigSchema = z.object({
+  show: z.boolean().optional(),
+  order: z.number().optional(),
+});
+
+const propertyViewConfigValueSchema = z.union([
+  tablePropertyViewConfigSchema,
+  kanbanPropertyViewConfigSchema,
+  calendarPropertyViewConfigSchema,
+  listPropertyViewConfigSchema,
+]);
+
 const propertyViewsConfigSchema = z.record(
   z.string(),
-  z.string(), // JSON string for view-specific config (kanban, table, calendar, etc.)
+  propertyViewConfigValueSchema,
 );
 export type PropertyViewsConfig = z.infer<typeof propertyViewsConfigSchema>;
 
@@ -117,7 +207,34 @@ const viewDefinitionSchema = z.object({
   visiblePropertyKeys: z.array(z.string()).optional(),
   sortKey: z.string().optional(),
   groupBy: z.string().optional(),
-  filters: z.string().optional(), // JSON string for filter definitions
+  filters: z
+    .object({
+      mode: z.enum(["all", "any"]).optional(),
+      rules: z.array(
+        z.object({
+          key: z.string(),
+          op: z.enum([
+            "eq",
+            "neq",
+            "contains",
+            "startsWith",
+            "endsWith",
+            "lt",
+            "lte",
+            "gt",
+            "gte",
+            "in",
+            "notIn",
+            "isNull",
+            "isNotNull",
+          ]),
+          value: z
+            .union([propertyValueSchema, z.array(propertyValueSchema)])
+            .optional(),
+        }),
+      ),
+    })
+    .optional(),
 });
 export type ViewDefinition = z.infer<typeof viewDefinitionSchema>;
 
@@ -127,7 +244,7 @@ export const ViewDefinitionMap = co.map({
   visiblePropertyKeys: z.array(z.string()).optional(),
   sortKey: z.string().optional(),
   groupBy: z.string().optional(),
-  filters: z.string().optional(),
+  filters: viewDefinitionSchema.shape.filters,
 });
 export type ViewDefinitionInput = co.input<typeof ViewDefinitionMap>;
 export type ViewDefinitionValue = co.loaded<typeof ViewDefinitionMap>;
@@ -152,6 +269,30 @@ export type ItemPropertyDefinitionValue = co.loaded<
 >;
 
 export const ItemValues = co.record(z.string(), propertyValueSchema);
+
+const tagMetadataSchema = z.object({
+  backgroundColor: z.string().optional(),
+  textColor: z.string().optional(),
+  icon: z.string().optional(),
+});
+
+const tagsDataSchema = z.record(z.string(), tagMetadataSchema);
+export type TagsData = z.infer<typeof tagsDataSchema>;
+
+const projectPropertyValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.date(),
+  tagsDataSchema,
+  z.literal(null),
+]);
+
+export type ProjectPropertyValue = z.infer<typeof projectPropertyValueSchema>;
+export const ProjectPropertyValues = co.record(
+  z.string(),
+  projectPropertyValueSchema,
+);
 // ============ Item (Jazz) ============
 
 export const Item = co.map({
@@ -162,8 +303,6 @@ export const Item = co.map({
 
 export type ItemInput = co.input<typeof Item>;
 export type ItemValue = co.loaded<typeof Item>;
-
-const ItemList = co.list(Item);
 // ============ Project (Jazz) ============
 
 export const Project = co.map({
@@ -171,12 +310,10 @@ export const Project = co.map({
   description: z.string().optional(),
   createdAt: z.date(),
   //users: co.list(MyAppAccount),
+  items: co.list(Item),
   propertyDefinitions: co.list(ItemPropertyDefinition),
+  projectValues: co.optional(ProjectPropertyValues),
   views: co.optional(co.list(ViewDefinitionMap)),
-
-  get items(): co.List<typeof Item> {
-    return ItemList;
-  },
 });
 
 export type ProjectInput = co.input<typeof Project>;

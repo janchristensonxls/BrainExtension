@@ -1,14 +1,18 @@
 import type {
   ItemPropertyDefinitionValue,
   PropertyValue,
+  TagsData,
 } from "@/coTypes/data";
-import { Input } from "../ui/input";
+import { Project } from "@/coTypes/data";
+import { useSuspenseCoState } from "jazz-tools/react";
+import { TagInput, type TagOption } from "../ui/tag-input";
 
 type PropertyPreviewProps = {
   value: PropertyValue;
   propDef: ItemPropertyDefinitionValue;
+  projectId?: string;
   onOpenEditor?: () => void;
-  onChange?: (v: string[]) => void;
+  onChange?: (v: PropertyValue) => void;
 };
 
 function normalizeTags(value: PropertyValue): string[] {
@@ -24,31 +28,32 @@ function normalizeTags(value: PropertyValue): string[] {
   return [];
 }
 
+function isTagsData(value: unknown): value is TagsData {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export const TagsPreview: React.FC<PropertyPreviewProps> = ({
   value,
   propDef,
+  projectId,
   onChange,
 }) => {
   const tags = normalizeTags(value);
   const interaction = propDef.presentation?.interaction ?? "inlineEditor";
   const widget = propDef.editor?.widget ?? "tagInput";
   const inline =
-    interaction === "inlineEditor" && widget === "tagInput" && !!onChange;
+    interaction === "inlineEditor" &&
+    widget === "tagInput" &&
+    !!onChange &&
+    !!projectId;
 
   if (inline) {
     return (
-      <Input
-        value={tags.join(", ")}
-        onChange={(event) => {
-          const next = event.target.value;
-          const parsed = next
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean);
-          onChange(parsed);
-        }}
-        className="h-8 text-sm"
-        placeholder="Add tags"
+      <TagsInlineEditor
+        projectId={projectId}
+        propDef={propDef}
+        tags={tags}
+        onChange={onChange}
       />
     );
   }
@@ -70,3 +75,68 @@ export const TagsPreview: React.FC<PropertyPreviewProps> = ({
     </div>
   );
 };
+
+function TagsInlineEditor({
+  projectId,
+  propDef,
+  tags,
+  onChange,
+}: {
+  projectId: string;
+  propDef: ItemPropertyDefinitionValue;
+  tags: string[];
+  onChange: (v: PropertyValue) => void;
+}) {
+  const project = useSuspenseCoState(Project, projectId, {
+    resolve: {
+      projectValues: {
+        $each: true,
+      },
+    },
+  });
+
+  const currentTagData = project.projectValues?.[propDef.key];
+  const tagData: TagsData = isTagsData(currentTagData) ? currentTagData : {};
+  const options: TagOption[] = Object.keys(tagData).map((tagName) => ({
+    value: tagName,
+    label: tagName,
+  }));
+  const selectedTags: TagOption[] = tags.map((tagName) => ({
+    value: tagName,
+    label: tagName,
+  }));
+
+  const handleTagsChange = (nextTags: TagOption[]) => {
+    const nextTagNames = nextTags.map((tag) => tag.label.trim()).filter(Boolean);
+    onChange(nextTagNames);
+
+    const nextTagData = { ...tagData };
+    for (const tagName of nextTagNames) {
+      if (!nextTagData[tagName]) {
+        nextTagData[tagName] = {};
+      }
+    }
+
+    if (project.$jazz.loadingState !== "loaded") {
+      return;
+    }
+
+    if (!project.projectValues) {
+      project.$jazz.set("projectValues", {});
+    }
+
+    if (project.projectValues?.$jazz.loadingState === "loaded") {
+      project.projectValues.$jazz.set(propDef.key, nextTagData);
+    }
+  };
+
+  return (
+    <TagInput
+      options={options}
+      selectedTags={selectedTags}
+      onTagsChange={handleTagsChange}
+      placeholder="Add tags"
+      allowCreate={true}
+    />
+  );
+}

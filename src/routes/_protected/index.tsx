@@ -61,6 +61,9 @@ function IndexComponent() {
       me.root.myProjects.$jazz.push({
         name: projectName,
         items: [],
+        projectValues: {
+          tags: {},
+        },
         propertyDefinitions: [statusPropertyDefinition, isCompletedPropertyDefinition, descriptionPropertyDefinition, estimatePropertyDefinition, dueDatePropertyDefinition, tagsPropertyDefinition],
         views: [
           {

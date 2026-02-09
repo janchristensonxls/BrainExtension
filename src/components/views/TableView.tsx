@@ -10,12 +10,14 @@ type TableViewProps = {
   items: readonly ItemValue[];
   propertyDefinitions: readonly ItemPropertyDefinitionValue[];
   view: ViewDefinitionValue;
+  projectId: string;
 };
 
 export const TableView: React.FC<TableViewProps> = ({
   items,
   propertyDefinitions,
   view,
+  projectId,
 }) => {
   const visibleKeys = view.visiblePropertyKeys ?? [];
   const columns =
@@ -24,7 +26,7 @@ export const TableView: React.FC<TableViewProps> = ({
       : propertyDefinitions;
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
+    <div className="overflow-visible rounded-lg border border-border">
       <table className="w-full text-sm">
         <thead className="bg-muted">
           <tr>
@@ -52,6 +54,7 @@ export const TableView: React.FC<TableViewProps> = ({
                     <PropertyView
                       valuesId={item.values.$jazz.id}
                       propDef={def}
+                      projectId={projectId}
                     />
                   </td>
                 ))}

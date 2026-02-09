@@ -13,10 +13,15 @@ function getPropsByRegion(defs: readonly ItemPropertyDefinitionValue[], region: 
 
 export interface ItemCardProps {
   itemId: string;
+  projectId: string;
   propertyDefinitions: readonly ItemPropertyDefinitionValue[];
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({
+  itemId,
+  projectId,
+  propertyDefinitions,
+}) => {
   const item = useSuspenseCoState(ItemCoType, itemId, {
     resolve: {
       values: {
@@ -53,7 +58,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
         color: decorations.textColor ?? "",
         display: "flex",
       }}
-      className="p-0 overflow-hidden"
+      className="p-0 overflow-visible"
     >
       {/* Left colored bar */}
       <div
@@ -98,7 +103,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
                 }}
               >
                 {headerProps.map((propDef) => (
-                  <PropertyView key={propDef.$jazz._instanceID ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
+                  <PropertyView
+                    key={propDef.$jazz._instanceID ?? propDef.key}
+                    valuesId={item.values.$jazz.id}
+                    propDef={propDef}
+                    projectId={projectId}
+                  />
                 ))}
               </div>
             )}
@@ -114,7 +124,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
               >
                 {subtitleProps.map((propDef) => (
                   <div key={propDef.$jazz.id ?? propDef.key}>
-                    <PropertyView valuesId={item.values.$jazz.id} propDef={propDef} />
+                    <PropertyView
+                      valuesId={item.values.$jazz.id}
+                      propDef={propDef}
+                      projectId={projectId}
+                    />
                   </div>
                 ))}
               </div>
@@ -134,7 +148,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
               }}
             >
               {sidebarProps.map((propDef) => (
-                <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
+                <PropertyView
+                  key={propDef.$jazz.id ?? propDef.key}
+                  valuesId={item.values.$jazz.id}
+                  propDef={propDef}
+                  projectId={projectId}
+                />
               ))}
             </div>
           )}
@@ -151,7 +170,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
             }}
           >
             {badgesProps.map((propDef) => (
-              <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
+              <PropertyView
+                key={propDef.$jazz.id ?? propDef.key}
+                valuesId={item.values.$jazz.id}
+                propDef={propDef}
+                projectId={projectId}
+              />
             ))}
             {decorations.badges.map((b) => (
               <span
@@ -187,7 +211,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({ itemId, propertyDefinitions 
             }}
           >
             {bodyProps.map((propDef) => (
-              <PropertyView key={propDef.$jazz.id ?? propDef.key} valuesId={item.values.$jazz.id} propDef={propDef} />
+              <PropertyView
+                key={propDef.$jazz.id ?? propDef.key}
+                valuesId={item.values.$jazz.id}
+                propDef={propDef}
+                projectId={projectId}
+              />
             ))}
           </div>
         )}

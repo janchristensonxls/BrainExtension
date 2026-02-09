@@ -9,11 +9,13 @@ import { propertyTypeRegistry } from "../propertyTypeConfigs";
 type PropertyViewProps = {
   valuesId: string;
   propDef: ItemPropertyDefinitionValue;
+  projectId?: string;
 };
 
 export const PropertyView: React.FC<PropertyViewProps> = ({
   valuesId,
   propDef,
+  projectId,
 }) => {
   const { $jazz, value } = useSuspenseCoState(ItemValues, valuesId, {
     resolve: {
@@ -75,6 +77,7 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
         <Preview
           value={value}
           propDef={propDef}
+          projectId={projectId}
           onOpenEditor={onOpenEditor ? () => onOpenEditor() : undefined}
           onChange={
             onChangeProperty
@@ -93,6 +96,7 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
         <Preview
           value={value}
           propDef={propDef}
+          projectId={projectId}
           onOpenEditor={onOpenEditor ? () => onOpenEditor() : undefined}
           onChange={
             onChangeProperty

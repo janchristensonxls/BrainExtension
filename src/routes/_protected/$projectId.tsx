@@ -77,7 +77,12 @@ function RouteComponent() {
         <Button onClick={handleAddItem}>Add Item</Button>
         {project.views?.[0]?.type === "table" && (
           <div className="mt-4">
-            <TableView items={project.items} propertyDefinitions={project.propertyDefinitions} view={project.views[0]} />
+            <TableView
+              items={project.items}
+              propertyDefinitions={project.propertyDefinitions}
+              view={project.views[0]}
+              projectId={project.$jazz.id}
+            />
           </div>
         )}
         {project.items.length > 0 ? (
@@ -86,7 +91,11 @@ function RouteComponent() {
               .filter((item) => item.$isLoaded)
               .map((item) => (
                 <div className="mb-2" key={item.$jazz.id}>
-                  <ItemCard itemId={item.$jazz.id} propertyDefinitions={project.propertyDefinitions} />
+                  <ItemCard
+                    itemId={item.$jazz.id}
+                    projectId={project.$jazz.id}
+                    propertyDefinitions={project.propertyDefinitions}
+                  />
                 </div>
               ))}
           </div>

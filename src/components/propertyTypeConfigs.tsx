@@ -16,6 +16,7 @@ type PropertyTypeConfig = {
   preview?: React.ComponentType<{
     value: PropertyValue;
     propDef: ItemPropertyDefinitionValue;
+    projectId?: string;
     onOpenEditor?: () => void;
     onChange?: (v: PropertyValue) => void;
   }>;

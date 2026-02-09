@@ -14,6 +14,6 @@ export const descriptionPropertyDefinition: ItemPropertyDefinitionInput = {
 
   editor: {
     widget: "textarea",
-    options: JSON.stringify({}),
+    options: {},
   },
 };
